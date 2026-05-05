@@ -23,6 +23,7 @@ export function HistoryList({ sales, loading, error }) {
       <div className="history-list">
         {sales.map((sale) => (
           <article key={sale.id} className="history-card">
+            {/* Cabecalho resume identificacao, data e total da venda. */}
             <div className="history-card-header">
               <div>
                 <strong>Venda #{sale.id}</strong>
@@ -35,6 +36,7 @@ export function HistoryList({ sales, loading, error }) {
               </div>
             </div>
 
+            {/* A lista interna detalha quais itens compuseram a venda. */}
             <ul>
               {sale.items.map((item) => (
                 <li key={item.id}>

@@ -9,12 +9,19 @@ import { createSalesRoutes } from "./routes/salesRoutes.js";
 import { SalesService } from "./services/salesService.js";
 
 export async function createApp() {
+  // Centraliza leitura de configuracao para que a criacao da app
+  // sempre use a mesma origem de dados e o mesmo modo de storage.
   const env = getEnv();
+
+  // Escolhe entre MySQL e memoria conforme ambiente e disponibilidade.
   const repositories = await createRepositories(env);
+
+  // A regra de negocio fica em um servico unico usado pelas rotas.
   const salesService = new SalesService(repositories);
 
   const app = express();
 
+  // Habilita chamadas do frontend e parse automatico de JSON.
   app.use(cors());
   app.use(express.json());
 
@@ -26,10 +33,12 @@ export async function createApp() {
     });
   });
 
+  // Cada grupo de endpoints recebe apenas as dependencias que precisa.
   app.use("/api/health", createHealthRoutes(repositories));
   app.use("/api/products", createProductsRoutes(salesService));
   app.use("/api/sales", createSalesRoutes(salesService));
 
+  // Padroniza a resposta de erro sem expor stack trace ao cliente.
   app.use((error, _request, response, _next) => {
     response.status(400).json({
       message: error.message || "Erro interno no servidor."

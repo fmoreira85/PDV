@@ -1,4 +1,5 @@
 function mapSale(row) {
+  // Normaliza nomes de colunas do banco para o padrao usado no frontend.
   return {
     id: row.id,
     paymentMethod: row.payment_method,
@@ -18,6 +19,7 @@ export class MysqlSalesRepository {
     const connection = await this.pool.getConnection();
 
     try {
+      // Venda e itens precisam ser persistidos juntos para nao gerar registros orfaos.
       await connection.beginTransaction();
 
       const [saleResult] = await connection.query(
@@ -35,6 +37,7 @@ export class MysqlSalesRepository {
 
       const saleId = saleResult.insertId;
 
+      // Cada item da venda e salvo separadamente para manter historico detalhado.
       for (const item of saleData.items) {
         await connection.query(
           `
@@ -54,6 +57,7 @@ export class MysqlSalesRepository {
         );
       }
 
+      // Rele a venda gravada para devolver ao frontend o formato final persistido.
       const [saleRows] = await connection.query("SELECT * FROM sales WHERE id = ?", [saleId]);
       const [itemRows] = await connection.query(
         "SELECT * FROM sale_items WHERE sale_id = ? ORDER BY id ASC",
@@ -76,6 +80,7 @@ export class MysqlSalesRepository {
         }))
       };
     } catch (error) {
+      // Mantem a integridade do banco caso algum insert falhe.
       await connection.rollback();
       throw error;
     } finally {
@@ -84,6 +89,7 @@ export class MysqlSalesRepository {
   }
 
   async getDailySummary() {
+    // O resumo e calculado no banco para evitar trafego e processamento desnecessarios.
     const [rows] = await this.pool.query(
       `
         SELECT COUNT(*) AS salesCount, COALESCE(SUM(total_amount), 0) AS totalRevenue
@@ -99,6 +105,7 @@ export class MysqlSalesRepository {
   }
 
   async listHistory() {
+    // Busca vendas e itens em duas consultas e agrupa na camada de aplicacao.
     const [salesRows] = await this.pool.query(
       "SELECT * FROM sales ORDER BY created_at DESC, id DESC"
     );

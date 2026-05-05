@@ -1,4 +1,5 @@
 function mapProduct(row) {
+  // Traduz a estrutura do banco para o formato esperado pela aplicacao.
   return {
     id: row.id,
     name: row.name,
@@ -18,6 +19,7 @@ export class MysqlProductsRepository {
     const normalized = `%${search.trim()}%`;
     const hasSearch = search.trim().length > 0;
 
+    // Quando nao ha busca, :hasSearch = 0 faz a query retornar todos os produtos.
     const [rows] = await this.pool.query(
       `
         SELECT id, name, category, barcode, price, stock
@@ -39,6 +41,7 @@ export class MysqlProductsRepository {
       return [];
     }
 
+    // Busca em lote para evitar uma consulta por item da venda.
     const [rows] = await this.pool.query(
       `
         SELECT id, name, category, barcode, price, stock
@@ -55,9 +58,11 @@ export class MysqlProductsRepository {
     const connection = await this.pool.getConnection();
 
     try {
+      // A transacao garante que a baixa de varios itens aconteca como uma operacao atomica.
       await connection.beginTransaction();
 
       for (const item of items) {
+        // FOR UPDATE bloqueia a linha para evitar concorrencia no estoque.
         const [rows] = await connection.query(
           "SELECT id, name, stock FROM products WHERE id = ? FOR UPDATE",
           [item.productId]
@@ -81,6 +86,7 @@ export class MysqlProductsRepository {
 
       await connection.commit();
     } catch (error) {
+      // Em qualquer falha, desfaz todas as baixas feitas na transacao.
       await connection.rollback();
       throw error;
     } finally {

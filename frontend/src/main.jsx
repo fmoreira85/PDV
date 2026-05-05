@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.jsx";
 
+// Monta a aplicacao React e habilita roteamento baseado na URL.
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

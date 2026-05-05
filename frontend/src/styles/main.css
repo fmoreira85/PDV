@@ -1,4 +1,5 @@
 :root {
+  /* Paleta e tokens visuais compartilhados pela interface inteira. */
   --bg: #f7f4ef;
   --panel: rgba(255, 255, 255, 0.82);
   --panel-border: rgba(34, 32, 58, 0.1);
@@ -16,6 +17,7 @@
 }
 
 body {
+  /* Fundo suave com gradiente para dar profundidade sem competir com os paineis. */
   margin: 0;
   min-width: 320px;
   background:
@@ -31,6 +33,7 @@ input {
 }
 
 .app-shell {
+  /* Container central que limita a largura da aplicacao desktop. */
   max-width: 1320px;
   margin: 0 auto;
   padding: 24px;
@@ -85,6 +88,7 @@ input {
 }
 
 .tab-switcher {
+  /* As abas funcionam como um seletor visual entre as duas areas principais. */
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(140px, 1fr));
   gap: 4px;
@@ -112,6 +116,7 @@ input {
 }
 
 .dashboard-grid {
+  /* Distribui catalogo, carrinho e pagamento em tres colunas na tela grande. */
   display: grid;
   grid-template-columns: 1.1fr 1.1fr 0.9fr;
   gap: 20px;
@@ -129,6 +134,7 @@ input {
 }
 
 .panel {
+  /* Painel de vidro fosco reutilizado em todas as secoes do sistema. */
   min-height: 560px;
   background: var(--panel);
   border: 1px solid var(--panel-border);
@@ -182,6 +188,7 @@ input {
 }
 
 .product-list {
+  /* Area rolavel para suportar muitos produtos sem crescer a pagina inteira. */
   max-height: 720px;
   overflow: auto;
   padding-right: 6px;
@@ -228,6 +235,7 @@ input {
 .step-button,
 .quick-actions button,
 .finalize-button {
+  /* Transicao unica para manter interacoes consistentes entre botoes. */
   border: 0;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
@@ -261,6 +269,7 @@ input {
 }
 
 .cart-item {
+  /* Grid com informacoes, controle de quantidade e subtotal na mesma linha. */
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 14px;
@@ -290,6 +299,7 @@ input {
 .cart-total,
 .change-box,
 .payment-summary {
+  /* Blocos de destaque para valores financeiros mais importantes. */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -325,6 +335,7 @@ input {
 }
 
 .payment-options {
+  /* Lista vertical simples porque cada forma de pagamento precisa de leitura clara. */
   display: grid;
   gap: 10px;
 }
@@ -402,6 +413,7 @@ input {
 }
 
 .history-card ul {
+  /* Remove marcadores padrao para deixar os itens com cara de resumo de venda. */
   list-style: none;
   margin: 18px 0 0;
   padding: 0;
@@ -414,6 +426,7 @@ input {
 }
 
 @media (max-width: 1100px) {
+  /* Em larguras medias, os paineis passam a empilhar para manter legibilidade. */
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
@@ -424,6 +437,7 @@ input {
 }
 
 @media (max-width: 720px) {
+  /* Ajustes finais para celular: menos padding e blocos em coluna unica. */
   .app-shell {
     padding: 16px;
   }

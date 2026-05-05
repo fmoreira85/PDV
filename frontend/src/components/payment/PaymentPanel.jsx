@@ -7,6 +7,7 @@ const paymentOptions = [
   { value: "pix", label: "PIX", icon: "bi-phone" }
 ];
 
+// Atalhos de valores comuns para agilizar o recebimento em dinheiro.
 const quickAmounts = [20, 50, 100];
 
 export function PaymentPanel({
@@ -24,6 +25,7 @@ export function PaymentPanel({
   onQuickAmount,
   onSubmit
 }) {
+  // Apenas pagamento em dinheiro precisa informar valor recebido e troco.
   const cashPayment = paymentMethod === "dinheiro";
 
   return (
@@ -49,6 +51,7 @@ export function PaymentPanel({
                 type="radio"
                 name="paymentMethod"
                 checked={paymentMethod === option.value}
+                // A pagina decide o efeito da troca de forma de pagamento.
                 onChange={() => onPaymentMethodChange(option.value)}
               />
               <span>
@@ -68,6 +71,7 @@ export function PaymentPanel({
           step="0.01"
           disabled={!cashPayment}
           value={amountReceived}
+          // Mantem o valor bruto digitado para a pagina converter e validar.
           onChange={(event) => onAmountReceivedChange(event.target.value)}
           placeholder="0,00"
         />
@@ -99,6 +103,7 @@ export function PaymentPanel({
         type="button"
         className="finalize-button"
         disabled={!canSubmit || submitting}
+        // A finalizacao dispara a persistencia da venda no backend.
         onClick={onSubmit}
       >
         <i className="bi bi-calculator" />{" "}

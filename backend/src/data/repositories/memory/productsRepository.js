@@ -1,6 +1,7 @@
 import { getMemoryState } from "./memoryStore.js";
 
 function normalizeText(value) {
+  // Remove diferencas de caixa e acentuacao para uma busca mais amigavel.
   return value.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 }
 
@@ -11,6 +12,7 @@ export class MemoryProductsRepository {
 
     const products = query
       ? state.products.filter((product) => {
+          // Monta um texto pesquisavel com nome, categoria e codigo de barras.
           const haystack = normalizeText(
             `${product.name} ${product.category} ${product.barcode}`
           );
@@ -23,6 +25,7 @@ export class MemoryProductsRepository {
 
   async findByIds(ids) {
     const state = getMemoryState();
+    // Retorna copias para impedir mutacoes acidentais fora do repositorio.
     return state.products
       .filter((product) => ids.includes(product.id))
       .map((product) => ({ ...product }));
@@ -31,6 +34,7 @@ export class MemoryProductsRepository {
   async decrementStock(items) {
     const state = getMemoryState();
 
+    // Primeiro valida tudo; so depois altera o estado para nao baixar estoque pela metade.
     for (const item of items) {
       const product = state.products.find((entry) => entry.id === item.productId);
 
@@ -43,6 +47,7 @@ export class MemoryProductsRepository {
       }
     }
 
+    // Com tudo validado, aplica a baixa de estoque.
     for (const item of items) {
       const product = state.products.find((entry) => entry.id === item.productId);
       product.stock -= item.quantity;

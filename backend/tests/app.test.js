@@ -6,11 +6,13 @@ import { resetMemoryState } from "../src/data/repositories/memory/memoryStore.js
 
 describe("PDV API", () => {
   beforeEach(() => {
+    // Forca um ambiente previsivel para os testes, sem dependencia de MySQL.
     process.env.STORAGE_MODE = "memory";
     resetMemoryState();
   });
 
   it("retorna status de saude", async () => {
+    // Cada teste monta a app do zero para isolar efeitos colaterais.
     const { app } = await createApp();
 
     const response = await request(app).get("/api/health");
@@ -23,6 +25,7 @@ describe("PDV API", () => {
   it("lista produtos e filtra por busca", async () => {
     const { app } = await createApp();
 
+    // Verifica se a busca textual encontra produtos esperados.
     const response = await request(app).get("/api/products").query({ q: "coca" });
 
     expect(response.status).toBe(200);
@@ -33,6 +36,7 @@ describe("PDV API", () => {
   it("cria venda em dinheiro e atualiza resumo", async () => {
     const { app } = await createApp();
 
+    // Simula o fluxo principal do PDV: vender e depois consultar o painel.
     const saleResponse = await request(app).post("/api/sales").send({
       paymentMethod: "dinheiro",
       amountReceived: 10,
@@ -51,6 +55,7 @@ describe("PDV API", () => {
   it("bloqueia venda em dinheiro sem valor suficiente", async () => {
     const { app } = await createApp();
 
+    // Garante que a validacao de caixa insuficiente protege a operacao.
     const response = await request(app).post("/api/sales").send({
       paymentMethod: "dinheiro",
       amountReceived: 4,

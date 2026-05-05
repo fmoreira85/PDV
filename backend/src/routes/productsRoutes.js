@@ -5,6 +5,7 @@ export function createProductsRoutes(salesService) {
 
   router.get("/", async (request, response, next) => {
     try {
+      // Reutiliza o servico para concentrar busca e regras em um unico lugar.
       const products = await salesService.listProducts(request.query.q ?? "");
       response.json(products);
     } catch (error) {

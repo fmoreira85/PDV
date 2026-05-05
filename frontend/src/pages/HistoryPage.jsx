@@ -4,6 +4,7 @@ import { fetchHistory } from "../api/pdvApi.js";
 import { HistoryList } from "../components/history/HistoryList.jsx";
 
 export function HistoryPage() {
+  // Estado simples para carregar e exibir o historico consolidado.
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,6 +22,7 @@ export function HistoryPage() {
       }
     }
 
+    // O historico e buscado uma vez ao abrir a pagina.
     loadHistory();
   }, []);
 

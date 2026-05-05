@@ -1,3 +1,4 @@
+// Massa inicial usada no modo em memoria para desenvolvimento e testes.
 export const sampleProducts = [
   {
     id: 1,
@@ -51,6 +52,7 @@ export const sampleProducts = [
 
 export function createMemorySeed() {
   return {
+    // Clona produtos para evitar que alteracoes de estoque modifiquem a lista base.
     products: sampleProducts.map((product) => ({ ...product })),
     sales: [],
     saleItems: [],

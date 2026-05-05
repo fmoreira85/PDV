@@ -1,6 +1,8 @@
+-- Cria o banco usado pelo backend quando o modo MySQL estiver ativo.
 CREATE DATABASE IF NOT EXISTS pdv_supermercado;
 USE pdv_supermercado;
 
+-- Cadastro base de produtos disponiveis para consulta e venda.
 CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
@@ -11,6 +13,7 @@ CREATE TABLE IF NOT EXISTS products (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Cabecalho da venda com totais e forma de pagamento.
 CREATE TABLE IF NOT EXISTS sales (
   id INT AUTO_INCREMENT PRIMARY KEY,
   payment_method ENUM('dinheiro', 'credito', 'debito', 'pix') NOT NULL,
@@ -20,6 +23,7 @@ CREATE TABLE IF NOT EXISTS sales (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Itens detalhados de cada venda, separados para manter historico completo.
 CREATE TABLE IF NOT EXISTS sale_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   sale_id INT NOT NULL,
@@ -31,8 +35,10 @@ CREATE TABLE IF NOT EXISTS sale_items (
   subtotal DECIMAL(10, 2) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_sale_items_sale
+    -- Se a venda for removida, seus itens tambem devem sair para evitar lixo logico.
     FOREIGN KEY (sale_id) REFERENCES sales(id)
     ON DELETE CASCADE,
   CONSTRAINT fk_sale_items_product
+    -- Mantem integridade referencial com o produto original vendido.
     FOREIGN KEY (product_id) REFERENCES products(id)
 );

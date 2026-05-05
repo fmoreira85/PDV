@@ -4,6 +4,7 @@ export function createHealthRoutes({ mode, fallbackReason }) {
   const router = Router();
 
   router.get("/", (_request, response) => {
+    // Exibe tambem o modo de armazenamento para facilitar diagnostico.
     response.json({
       status: "ok",
       storageMode: mode,

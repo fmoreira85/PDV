@@ -1,12 +1,14 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 function navClassName({ isActive }) {
+  // O estado ativo da rota controla o destaque visual da aba.
   return `pdv-tab ${isActive ? "active" : ""}`;
 }
 
 export function AppShell() {
   return (
     <main className="app-shell">
+      {/* Cabecalho fixo com contexto geral do sistema. */}
       <header className="topbar">
         <div>
           <p className="eyebrow">Ponto de Venda - Desktop</p>
@@ -23,6 +25,7 @@ export function AppShell() {
         </div>
       </header>
 
+      {/* Navegacao principal entre operacao de venda e consulta de historico. */}
       <nav className="tab-switcher" aria-label="Navegacao principal">
         <NavLink to="/pdv" className={navClassName}>
           <i className="bi bi-cart3" /> PDV
@@ -32,6 +35,7 @@ export function AppShell() {
         </NavLink>
       </nav>
 
+      {/* As paginas filhas sao renderizadas aqui pelo React Router. */}
       <Outlet />
     </main>
   );

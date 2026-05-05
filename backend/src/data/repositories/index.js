@@ -8,6 +8,7 @@ export async function createRepositories(env) {
   const requestedMode = env.storageMode.toLowerCase();
 
   if (requestedMode === "memory") {
+    // Modo explicito em memoria: ideal para testes e demos locais.
     return {
       mode: "memory",
       productsRepository: new MemoryProductsRepository(),
@@ -16,6 +17,7 @@ export async function createRepositories(env) {
   }
 
   try {
+    // Em auto ou mysql, tenta abrir conexao real primeiro.
     const pool = await createMysqlPool(env.mysql);
 
     return {
@@ -26,9 +28,11 @@ export async function createRepositories(env) {
     };
   } catch (error) {
     if (requestedMode === "mysql") {
+      // Se o usuario exigiu MySQL, falhamos em vez de esconder o problema.
       throw error;
     }
 
+    // Em modo auto, caimos para memoria para nao impedir o uso da aplicacao.
     return {
       mode: "memory",
       fallbackReason: error.message,

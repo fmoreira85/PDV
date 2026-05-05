@@ -15,6 +15,7 @@ export function CartPanel({ items, totalAmount, onIncrease, onDecrease }) {
         </div>
       ) : (
         <>
+          {/* Lista itens ja adicionados e permite ajustar quantidade sem voltar ao catalogo. */}
           <div className="cart-list">
             {items.map((item) => (
               <article key={item.id} className="cart-item">
@@ -26,6 +27,7 @@ export function CartPanel({ items, totalAmount, onIncrease, onDecrease }) {
                 </div>
 
                 <div className="cart-actions">
+                  {/* Os botoes manipulam o carrinho pelo id do produto. */}
                   <button type="button" className="step-button" onClick={() => onDecrease(item.id)}>
                     <i className="bi bi-dash" />
                   </button>
@@ -40,6 +42,7 @@ export function CartPanel({ items, totalAmount, onIncrease, onDecrease }) {
             ))}
           </div>
 
+          {/* Exibe o acumulado atual antes da etapa de pagamento. */}
           <div className="cart-total">
             <span>Total parcial</span>
             <strong>{formatCurrency(totalAmount)}</strong>

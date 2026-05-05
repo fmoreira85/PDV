@@ -1,5 +1,7 @@
+-- Seleciona o banco antes de popular os dados iniciais.
 USE pdv_supermercado;
 
+-- Insere o catalogo base e atualiza registros existentes caso o seed rode novamente.
 INSERT INTO products (name, category, barcode, price, stock)
 VALUES
   ('Coca-Cola 350ml', 'Bebidas', '7894900011517', 4.50, 50),
