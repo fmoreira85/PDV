@@ -2,6 +2,7 @@
 
 Aplicacao web de PDV para supermercado com:
 
+- login de operador e cadastro de usuario
 - busca de produtos
 - carrinho de compras
 - escolha de forma de pagamento
@@ -51,6 +52,7 @@ Variaveis importantes:
 - `STORAGE_MODE=auto`: tenta MySQL e faz fallback para memoria se o banco nao estiver disponivel
 - `STORAGE_MODE=mysql`: exige MySQL ativo
 - `STORAGE_MODE=memory`: usa apenas dados em memoria
+- `AUTH_SECRET`: segredo usado para assinar os tokens de autenticacao
 
 ### 2. Banco MySQL
 
@@ -100,17 +102,32 @@ npm run dev
 
 Depois abra o endereco informado pelo Vite, normalmente `http://localhost:5173`.
 
+## Autenticacao
+
+No primeiro acesso, abra a tela inicial e use a aba `Cadastro` para criar um operador com:
+
+- nome
+- email
+- senha
+
+Depois disso, o login libera o acesso ao PDV e ao historico. As rotas `/api/products` e `/api/sales/*`
+passam a exigir token Bearer valido.
+
 ## Fluxo principal
 
-1. Busque um produto pelo nome, categoria ou codigo de barras.
-2. Adicione itens ao carrinho.
-3. Escolha a forma de pagamento.
-4. Em dinheiro, informe o valor recebido ou use os atalhos.
-5. Finalize a venda.
-6. Acesse `Historico` para consultar as vendas registradas.
+1. Entre com um operador existente ou cadastre um novo usuario.
+2. Busque um produto pelo nome, categoria ou codigo de barras.
+3. Adicione itens ao carrinho.
+4. Escolha a forma de pagamento.
+5. Em dinheiro, informe o valor recebido ou use os atalhos.
+6. Finalize a venda.
+7. Acesse `Historico` para consultar as vendas registradas.
 
 ## Endpoints da API
 
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 - `GET /api/health`
 - `GET /api/products?q=texto`
 - `GET /api/sales/summary`
@@ -136,10 +153,11 @@ Durante esta entrega foram executados:
 
 - `cd backend && npm test`
 - `cd frontend && npm run build`
-- smoke test HTTP do backend com `GET /api/health`, `GET /api/products`, `POST /api/sales` e `GET /api/sales/history`
+- smoke test HTTP do backend com `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me` e `GET /api/products`
 
 ## Observacoes
 
 - Em `STORAGE_MODE=memory`, os dados reiniciam ao subir o backend.
 - Em `STORAGE_MODE=auto`, a API continua funcional mesmo se o MySQL estiver indisponivel.
+- A autenticacao usa token assinado pelo backend e hash de senha persistido no repositorio configurado.
 - O frontend e responsivo, mas a composicao visual foi pensada principalmente para operacao desktop, como na referencia.

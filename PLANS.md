@@ -17,6 +17,7 @@ O sistema deve ser composto por:
 - integracao HTTP via Axios
 - navegacao com React Router
 - interface baseada visualmente na referencia `screens/home.jpeg`
+- autenticacao com login e cadastro de usuario para liberar a operacao
 
 ## Progress
 
@@ -30,6 +31,7 @@ O sistema deve ser composto por:
 - [x] Criar `README.md` com requisitos, configuracao, estrutura, scripts e fluxo de uso
 - [x] Executar validacoes tecnicas (testes backend, build frontend e smoke checks do fluxo principal) e registrar resultados
 - [x] Preencher `Outcomes & Retrospective` com o que foi entregue, limites atuais e proximos cuidados
+- [x] Criar tela de login com opcao de cadastrar usuario e proteger as rotas operacionais
 
 ## Surprises & Discoveries
 
@@ -37,6 +39,8 @@ O sistema deve ser composto por:
 - A referencia visual mostra um fluxo desktop-first com tres colunas, abas `PDV` e `Historico`, e foco grande em rapidez operacional.
 - O ambiente desta sessao bloqueou execucao direta de processos Node em alguns comandos com erro `EPERM` ao resolver `C:\Users\fabio`; para contornar isso, o build final do frontend e o smoke test HTTP precisaram ser executados fora do sandbox.
 - Para garantir demonstracao e testes locais mesmo sem MySQL ativo, foi necessario implementar fallback automatico em memoria no backend.
+- A inclusao de autenticacao exigiu atualizar os testes do backend para obter token antes de consultar produtos e vendas protegidas.
+- Para evitar migracoes destrutivas em bases ja existentes, a autenticacao foi isolada em uma nova tabela `users`, sem alterar a estrutura atual de `sales`.
 
 ## Decision Log
 
@@ -47,6 +51,9 @@ O sistema deve ser composto por:
 - O historico sera implementado como segunda rota do React Router, mantendo a mesma casca visual do painel principal.
 - A API foi definida com contratos REST simples (`/api/health`, `/api/products`, `/api/sales/summary`, `/api/sales/history`, `/api/sales`) para reduzir acoplamento e simplificar integracao com Axios.
 - O backend foi coberto com testes automatizados em modo `memory`, validando saude, busca de produtos, criacao de venda e regra de troco.
+- A autenticacao foi implementada sem dependencias extras, usando hash de senha com `crypto.scrypt` e token assinado com HMAC no proprio backend.
+- O frontend passou a restaurar a sessao a partir de `localStorage` e validar o token com `GET /api/auth/me` antes de liberar as rotas protegidas.
+- As rotas `/api/products` e `/api/sales/*` foram protegidas por middleware, mantendo apenas `/`, `/api/health` e `/api/auth/*` publicas.
 
 ## Outcomes & Retrospective
 
@@ -58,12 +65,16 @@ Entrega concluida com os seguintes resultados:
 - Frontend React com Vite entregue com duas rotas (`PDV` e `Historico`) e integracao real com a API.
 - Layout final alinhado ao conceito da referencia: cabecalho, alternancia de abas, coluna de produtos, carrinho central e painel de pagamento.
 - `README.md` criado com setup, scripts, endpoints e fluxo de uso.
+- Fluxo completo de autenticacao entregue com cadastro, login, restauracao de sessao e logout no frontend.
+- Backend estendido com `POST /api/auth/register`, `POST /api/auth/login` e `GET /api/auth/me`, mais protecao das rotas operacionais.
 
 Limites atuais e cuidados futuros:
 
 - O historico ainda nao possui filtros por periodo ou operador.
 - O frontend foi pensado prioritariamente para desktop, embora responda em telas menores.
-- Em ambiente real de producao, convem evoluir autenticacao, auditoria de operador e controle transacional mais avancado para estoque.
+- Em ambiente real de producao, convem evoluir autenticacao com expiracao renovavel, recuperacao de senha e perfis de acesso.
+- Ainda nao existe invalidacao ativa de token no servidor; o logout atual remove a sessao apenas do cliente.
+- O controle transacional de estoque e auditoria por operador pode ser aprofundado numa proxima etapa.
 
 ## Context and Orientation
 
@@ -90,11 +101,15 @@ Essa imagem serve como base visual para a tela principal do PDV. O sistema final
 5. Integrar a UI a API com Axios, cobrindo busca de produtos, resumo diario, criacao de venda e listagem de historico.
 6. Documentar instalacao e uso no `README.md`.
 7. Executar validacoes tecnicas, registrar evidencias neste plano e fechar o retrospecto final.
+8. Adicionar autenticacao com login, cadastro, restauracao de sessao e protecao das rotas operacionais.
 
 ## Concrete Steps
 
 1. Criar estrutura de pastas e `package.json` em `backend/` e `frontend/`.
 2. Definir contratos da API:
+   - `POST /api/auth/register`
+   - `POST /api/auth/login`
+   - `GET /api/auth/me`
    - `GET /api/health`
    - `GET /api/products?q=`
    - `GET /api/sales/summary`
@@ -104,6 +119,7 @@ Essa imagem serve como base visual para a tela principal do PDV. O sistema final
 4. Implementar repositorios:
    - repositorio de produtos
    - repositorio de vendas
+   - repositorio de usuarios
    - repositorio em memoria para fallback/testes
 5. Implementar validacoes de payload de venda:
    - pelo menos um item
@@ -120,11 +136,21 @@ Essa imagem serve como base visual para a tela principal do PDV. O sistema final
    - shell principal
    - pagina `PDV`
    - pagina `Historico`
-   - hooks de API
+   - pagina de autenticacao
+   - hooks e contexto de API/sessao
    - componentes de produtos, carrinho e pagamento
 9. Ajustar o visual com base na referencia `screens/home.jpeg`.
 10. Criar `README.md`.
 11. Rodar testes e build, corrigir problemas encontrados e registrar o resultado neste documento.
+12. Implementar login:
+   - email
+   - senha
+   - validacao do token da sessao
+13. Implementar cadastro:
+   - nome
+   - email
+   - senha
+   - entrada automatica apos criar o usuario
 
 ## Validation and Acceptance
 
@@ -140,16 +166,18 @@ O trabalho sera considerado aceito quando todos os pontos abaixo estiverem verda
 - O usuario conseguir finalizar uma venda e ver a venda refletida no historico.
 - O `README.md` explicar como configurar MySQL, como rodar em modo fallback e quais scripts executar.
 - As validacoes executadas devem ser registradas no final deste plano.
+- Testar se o login funciona.
+- Testar se o registro funciona.
 
 Resultado da validacao:
 
-- `cd backend && npm test` executado com sucesso: 4 testes aprovados.
-- `cd frontend && npm run build` executado com sucesso.
+- `cd backend && npm test` executado com sucesso: 5 testes aprovados, incluindo registro, login e consulta do perfil autenticado.
+- `cd frontend && npm run build` executado com sucesso fora do sandbox por causa do bloqueio `EPERM` do ambiente.
 - Smoke test HTTP executado com sucesso em backend rodando localmente:
-  - `GET /api/health` respondeu com `storageMode=memory`
-  - `GET /api/products?q=leite` retornou 1 produto
-  - `POST /api/sales` criou a venda `#1`
-  - `GET /api/sales/history` retornou 1 venda registrada
+  - `POST /api/auth/register` criou o operador `smoke@pdv.local`
+  - `POST /api/auth/login` retornou token valido
+  - `GET /api/auth/me` devolveu o usuario autenticado `Caixa Smoke`
+  - `GET /api/products?q=leite` funcionou com token e retornou 1 produto
 
 ## Idempotence and Recovery
 
@@ -167,6 +195,19 @@ Resultado da validacao:
   - `frontend/`
   - scripts SQL
   - `README.md`
+- Arquivos alterados nesta etapa:
+  - backend: `src/app.js`, `src/config/env.js`, `src/services/authService.js`, `src/routes/authRoutes.js`, `src/middlewares/authMiddleware.js`, `src/data/repositories/index.js`, `src/data/repositories/memory/usersRepository.js`, `src/data/repositories/mysql/usersRepository.js`, `src/data/sampleData.js`, `tests/app.test.js`, `database/schema.sql`, `.env.example`
+  - frontend: `src/App.jsx`, `src/main.jsx`, `src/api/client.js`, `src/api/authApi.js`, `src/context/AuthContext.jsx`, `src/components/auth/RouteGuards.jsx`, `src/components/layout/AppShell.jsx`, `src/pages/AuthPage.jsx`, `src/styles/main.css`
+  - documentacao: `README.md`, `PLANS.md`
+- Comandos executados nesta etapa:
+  - `git status --short`
+  - `Get-Content -Raw PLANS.md`
+  - `npm test` em `backend/`
+  - `npm run build` em `frontend/`
+  - smoke test PowerShell com `node src/server.js` e chamadas HTTP para registro, login, perfil e produtos
+- Observacoes:
+  - O frontend agora exige autenticacao antes de liberar `PDV` e `Historico`.
+  - O backend continua suportando `memory` e `mysql` para autenticacao, seguindo o mesmo padrao das demais entidades.
 
 ## Interfaces and Dependencies
 
