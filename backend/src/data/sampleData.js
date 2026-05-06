@@ -54,8 +54,10 @@ export function createMemorySeed() {
   return {
     // Clona produtos para evitar que alteracoes de estoque modifiquem a lista base.
     products: sampleProducts.map((product) => ({ ...product })),
+    users: [],
     sales: [],
     saleItems: [],
+    nextUserId: 1,
     nextSaleId: 1,
     nextSaleItemId: 1
   };

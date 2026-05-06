@@ -9,6 +9,7 @@ export function getEnv() {
     nodeEnv: process.env.NODE_ENV ?? "development",
     port: Number(process.env.PORT ?? 3333),
     storageMode: process.env.STORAGE_MODE ?? "auto",
+    authSecret: process.env.AUTH_SECRET ?? "pdv-dev-auth-secret",
     mysql: {
       // Agrupa configuracoes de banco para manter consumo mais simples no restante do codigo.
       host: process.env.MYSQL_HOST ?? "localhost",
